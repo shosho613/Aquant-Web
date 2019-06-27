@@ -1,5 +1,6 @@
 from PDF_Parser import PDF_Parser
 from Graph import Graph
+import csv
 
 class Console_UI(object):
 
@@ -59,8 +60,21 @@ class Console_UI(object):
                     self.graph.change_connection_label(event.id,e.id,real_label)
 
     def run_algo(self):
-        source_event_id = int(input("What event id would you like to run the observation output? "))
-        self.graph.observation_solution(self.graph.get_event(source_event_id))
+        for tree in self.graph.event_trees:
+            self.graph.observation_solution(tree)
+        print(self.graph.obser_solutions)
+    
+    def write_to_csv(self):
+        with open("output.csv", "w+") as csvfile:
+            filewriter = csv.writer(csvfile)
+            map = self.graph.obser_solutions
+            for o,solutions in map.items():
+                if solutions:
+                    to_write = []
+                    to_write.append(self.graph.get_event(o).get_content())
+                    for s in solutions:
+                        to_write.append(self.graph.get_event(s).get_content())
+                    filewriter.writerow(to_write)
 
     def driver(self):
         self.print_help()
@@ -70,7 +84,7 @@ class Console_UI(object):
         self.set_trees()
         self.set_event_types()
         self.run_algo()
-        print(self.graph.obser_solutions)
+        self.write_to_csv()
 
 
 

@@ -1,6 +1,7 @@
 import json
 from PDF_Parser import PDF_Parser
 from Graph import Graph
+import csv
 
 class JSON_Converter(object):
 
@@ -23,28 +24,63 @@ class JSON_Converter(object):
     
     def get_json_graph(self):
         self.json_rep['nodes'] = []
-        self.json_rep['connections'] = []
-        for event in self.graph.events:
-            self.json_rep['nodes'].append({
-                'id': event.id,
-                'content': event.content,
-                'type': None
-            })
-            for e,weight in event.get_connections().items():
-                if weight == 2:
-                    content = "Yes"
-                elif weight == 1:
-                    content = "No"
-                else:
-                    content = "Label Connection!"
-                self.json_rep['connections'].append({
-                    'id': "%s->%s"%(event.id, e.id),
-                    'sourceID': event.id,
-                    'targetID': e.id,
-                    'content': content
+        eventArrs = self.graph.get_connected_components()
+        for events in eventArrs:
+            print(events)
+            i = len(events) - 1
+            while i > 0:
+                print(i)
+                child = self.graph.get_event(events[i])
+                parent = self.graph.get_event(events[i-1])
+                self.json_rep['nodes'].append({
+                'Name': "node" + str(child.id) ,
+                'content': child.content,
+                'eventtype': 'None',
+                'ReportingPerson': "node" + str(parent.id)   
                 })
+                i -= 1
+            if i == 0:
+                child = self.graph.get_event(events[i])
+
+                self.json_rep['nodes'].append({
+                'Name': "node" + str(child.id) ,
+                'content': child.content,
+                'eventtype': 'None', 
+                })
+
+         
         with open('data.txt', 'w') as outfile:  
             json.dump(self.json_rep, outfile)
+    
+    def set_types(self, events):
+        for event in events:
+            id = int(event['Name'].split('node')[1])
+            eventtype = 'N'
+            if str(event['eventtype']) == 'Observation':
+                eventtype = 'O'
+            elif str(event['eventtype']) == 'Solution':
+                eventtype = 'S'
+            self.graph.get_event(id).set_type(eventtype)
+    
+    def run_algo(self):
+        for tree in self.graph.event_trees:
+            self.graph.observation_solution(tree)
+        print(self.graph.obser_solutions)
+    
+    def create_csv(self):
+        with open("output.csv", "w+") as csvfile:
+            filewriter = csv.writer(csvfile)
+            map = self.graph.obser_solutions
+            for o,solutions in map.items():
+                if solutions:
+                    to_write = []
+                    to_write.append(self.graph.get_event(o).get_content())
+                    for s in solutions:
+                        to_write.append(self.graph.get_event(s).get_content())
+                    filewriter.writerow(to_write)
+
+
+    
 
 
 def main():

@@ -28,9 +28,7 @@ class PDF_Parser(object):
     def with_pdf(self, fn, *args):
         result = None
         try:
-            __location__ = os.path.realpath(
-                os.path.join(os.getcwd(), os.path.dirname(__file__)))
-            fp = open(os.path.join(__location__, self.pdf_name), "rb");
+            fp = open(self.pdf_name, "rb");
 
             # create a parser object associated with the file object
             parser = PDFParser(fp)
@@ -255,7 +253,7 @@ def main():
     cc = result.get_connected_components()
     print(cc)
     print(result.get_total_event_connections(4))
-    result.observation_solution(cc[1])
+    result.driver()
     print(result.obser_solutions)
 
 

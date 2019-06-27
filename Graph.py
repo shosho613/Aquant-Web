@@ -5,6 +5,7 @@ class Graph(object):
         self.events = [None] * num_events
         self.contains_error = False
         self.obser_solutions = {} #key is observation, value is list of applicable solutions
+        self.event_trees = []
 
 
     def add_event(self, event):
@@ -58,6 +59,7 @@ class Graph(object):
             if visited[event.id] == False: 
                 temp = [] 
                 cc.append(self.DFS_cc(temp, event.id, visited))
+        self.event_trees = cc
         return cc
 
 
@@ -74,7 +76,6 @@ class Graph(object):
     #and every solution that can be reached using only yes connections
     def DFS(self, event_id,visited,temp):
         visited[event_id] = True
-
         event = self.events[event_id]
         for e in event.get_connections():
             if visited[e.id] is False and e.type is "S":
@@ -85,23 +86,25 @@ class Graph(object):
 
     #from src_event, @return list of all reachable nodes.
     def reachable_events(self,src_id, tree_arr):
-        visited = {}
         temp = []
+        visited = {}
         for t in tree_arr:
             visited[t] = False
         event = self.get_event(src_id)
         for e in event.get_connections():
-            if visited[e.id] is False and e.type is "S":
+            if visited[e.id] is False and event.get_weight(e) == 2 and e.type is "S":
                 temp.append(e.id)
                 self.DFS(e.id, visited, temp)
-            elif visited[e.id] is False and event.get_weight(e) == 2:
+            elif visited[e.id] is False and event.type is "O":
+                #temp.append(e.id)
                 self.DFS(e.id,visited,temp)
         return temp
 
     def observation_solution(self,tree_arr):
-        #visited = {}
         for t in tree_arr:
             self.obser_solutions[t] = self.reachable_events(t,tree_arr)
+
+
 
 
 

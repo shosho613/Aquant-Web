@@ -7,16 +7,21 @@ class Parser extends React.Component {
   
   constructor(props){
     super(props);
-    this.filename = props.location.state.filename
+    //this.filename = props.location.state.filename
     this.pagenum = props.location.state.pagenum
-    window.console.log(props)
-    this.state = {
-      data: null,
-    }
+    this.file = props.location.state.file
+    this.data = props.location.state.data
+
+    window.console.log(this.pagenum)
+    window.console.log(this.file)
+    window.console.log(this.data)
   }
 
-  componentDidMount(){
-  }
+  
+  
+
+
+
  
   render(){
       return (
@@ -26,7 +31,7 @@ class Parser extends React.Component {
       <Header/> 
       <div className="row"> 
         <div className="col-lg-7">
-        <DiagFlow/>
+          <DiagFlow/>
         </div>
         <div className="col-lg-5">
         <PdfViewer/>

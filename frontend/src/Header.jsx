@@ -13,8 +13,7 @@ class Header extends React.Component {
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <img src="https://pbs.twimg.com/media/Dn88s1aWsAAF4fH.png" width="200" height="150"alt=""/>
                 <h3 className="navbar-brand">Aquant-Fault Tree Parser</h3>
-                <button type="submit" className="btn btn-primary">Get Results</button>
-                
+                <h6>Please Label Events. Red = Observation, Blue = Solution.</h6>                
                 </nav>
                 </div>
         </div>
