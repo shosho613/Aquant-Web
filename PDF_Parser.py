@@ -11,7 +11,7 @@ import os
 
 from Event import Event
 from Graph import Graph
-
+import csv
 
 class PDF_Parser(object):
     def __init__(self,pdf_name):
@@ -20,6 +20,7 @@ class PDF_Parser(object):
         self.boxes = []
         self.arrows = []
         self.arrow_labels = []
+        self.root_event = None
         self.pdf_name = pdf_name
 
 
@@ -28,7 +29,7 @@ class PDF_Parser(object):
     def with_pdf(self, fn, *args):
         result = None
         try:
-            fp = open(self.pdf_name, "rb");
+            fp = open(self.pdf_name, "rb")
 
             # create a parser object associated with the file object
             parser = PDFParser(fp)
@@ -74,11 +75,11 @@ class PDF_Parser(object):
         for lt_obj in layout:
             if isinstance(lt_obj, LTCurve) and not isinstance(lt_obj, LTRect) and not isinstance(lt_obj, LTLine):
                 pointer = lt_obj
-                print("This is pointer: %s" % (pointer))
                 self.arrows.append(lt_obj)
             if isinstance(lt_obj, LTRect):
                 self.rects.append(lt_obj)
             if isinstance(lt_obj, LTTextBox):
+                print(lt_obj)
                 self.boxes.append(lt_obj)
             if isinstance(lt_obj, LTText):
                 for line in lt_obj:
@@ -90,20 +91,24 @@ class PDF_Parser(object):
 
     # find the text content in boxes
     def recognize_textboxes(self):
+        print(self.boxes)
         id = 0
         for rect in self.rects:
             for box in self.boxes:
                 box_content = ""
+                print("new box")
                 for line in box:
                     if self.isTextLine_inRect(rect,
                                          line):  # compare the boundaries of the rectangle to each textline within textbox
                         box_content += line.get_text()  # if so, add to box_content
+                        print("added, box content is now %s" % (box_content))
                 if box_content != "":
                     self.boxes.remove(box)  # already checked this box, so we remove.
                     event = Event(id,box_content)
                     id += 1
                     self.rect_content[rect] = event
-
+        self.root_event = Event(id, self.boxes[0].get_text())
+        print(self.root_event)
 
 
     def add_connections(self):
@@ -144,9 +149,13 @@ class PDF_Parser(object):
     def build_graph_from_pdf(self,doc, pagenum):
         self.categorize_layout(doc, pagenum)
         self.recognize_textboxes()
-        G = Graph(len(self.rect_content))
+        G = Graph(len(self.rect_content.values()) + 1)
+        print(len(self.rect_content.values()))
+        G.set_root_event(self.root_event)
+        print(repr(G.root_event))
         self.add_connections()
         for value_tuple in self.rect_content.values():
+            print(value_tuple)
             G.add_event(value_tuple)
         return G
 
@@ -235,27 +244,14 @@ class PDF_Parser(object):
 
 
 def main():
-    pdf_parser = PDF_Parser("Rational Troubleshooting guide.pdf")
+    pdf_parser = PDF_Parser("ComplexTree.pdf")
     print(pdf_parser.pdf_name)
-    result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, 37)
+    result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, 60)
+    print("PRINTING GRAPH")
     for i in result.get_events():
         print(repr(i))
 
-    result.print_graph()
-    result.get_event(4).set_type("O")
-    result.get_event(15).set_type("O")
-    result.get_event(5).set_type("S")
-    result.get_event(6).set_type("S")
-    result.get_event(16).set_type("N")
-    result.get_event(17).set_type("S")
-
-    print("-----------------")
-    cc = result.get_connected_components()
-    print(cc)
-    print(result.get_total_event_connections(4))
-    result.driver()
-    print(result.obser_solutions)
-
+    
 
 # print(result)
 

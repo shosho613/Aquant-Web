@@ -226,4 +226,13 @@ exports.multiParentData =
             "content" : "Test",
             "eventtype":"None"
         }
-    ]
+    ];
+
+exports.connectorData = [
+    {
+        id: "c1",
+        sourceID : "node0",
+        targetID : "node1",
+        content : "Yes"
+    }
+];

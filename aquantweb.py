@@ -12,9 +12,10 @@ aquantweb = Flask(__name__, static_folder='frontend/build/static', template_fold
 aquantweb.config.from_object('config')
 aquantweb.config['CORS_HEADERS'] = 'Content-Type'
 
-CORS(aquantweb)
+cors = CORS(aquantweb)
 
-
+addedEvents = []
+pdfFile = ""
 
 db.init_app(aquantweb)
 db.create_all(app=aquantweb)
@@ -24,6 +25,7 @@ jc = JSON_Converter()
 @aquantweb.route('/')
 def home():
     jc = JSON_Converter()
+# addedEvents = []
     return render_template('index.html')
 
 @aquantweb.route('/upload', methods = ['GET', 'POST'])
@@ -33,9 +35,10 @@ def upload_file():
         print(request.form)
         f = request.files.get("file")
         f.save(f.filename)
+        pdfFile = f.filename
+        print(pdfFile)
         pagenum = int(request.form.get("pagenum"))
         jc.get_graph_from_filename(f.filename,pagenum)
-        jc.get_json_graph()
         response = aquantweb.response_class(
             response=json.dumps(jc.json_rep),
             status=200,
@@ -43,12 +46,63 @@ def upload_file():
         return response
 
 
-@aquantweb.route('/GetNodes')
+@aquantweb.route('/GetBasicGraph')
 @cross_origin()
-def create_Nodes():
+def get_basic_graph():
     print(request)
     if request.method == 'GET':
+        jc.get_json_basic_graph()
+        response = aquantweb.response_class(
+            response=json.dumps(jc.json_rep),
+            status=200,
+            mimetype='application/json',)
+        print(response)
+        return response
+
+
+@aquantweb.route('/GetGraph', methods=["GET", "POST"])
+@cross_origin()
+def get_graph():
+    print(request)
+    if request.method == 'POST':
+        print(pdfFile)
+        pagenum = int(request.form.get("pagenum"))
+        f = request.files.get("file")
+        jc.get_graph_from_filename(f.filename,pagenum)
         jc.get_json_graph()
+        addedEvents = []
+        response = aquantweb.response_class(
+            response=json.dumps(jc.json_rep),
+            status=200,
+            mimetype='application/json',)
+        print(response)
+        return response
+
+@aquantweb.route('/GetAnnots', methods = ['GET', 'POST'], )
+@cross_origin()
+def get_annots():
+    print(request.form)
+    print(addedEvents)
+    currentID = request.form.get('size')
+    rep = jc.convert_to_json_nodes(addedEvents)
+    print(rep)
+    response = aquantweb.response_class(
+        response = json.dumps(rep),
+        status = 200,
+        mimetype='application/json'
+       )
+    return response
+
+
+
+
+
+@aquantweb.route('/GetConnectionLabels')
+@cross_origin()
+def get_Graph():
+    print(request)
+    if request.method == 'GET':
+        jc.get_JSON_connectors()
         response = aquantweb.response_class(
             response=json.dumps(jc.json_rep),
             status=200,
@@ -61,16 +115,28 @@ def create_Nodes():
 def download_csv():
     print(request)
     if request.method == 'POST':
-        print(request.form.get('data'))
-        events = json.loads(request.form.get('data'))
-        print(events)
-        jc.set_types(events)
+        jc.add_nodes(request.form.get('nodes'))
+        jc.add_connections(request.form.get('connectors'))
         for i in jc.graph.get_events():
             print(repr(i))
         jc.run_algo()
         jc.create_csv()
         file = open('output.csv','r')
         return send_file('output.csv', mimetype='text/csv')
+
+@aquantweb.route('/addEventsFromPDF' , methods=['GET', 'POST'])
+@cross_origin()
+def addEventsFromPDF():
+    print(request.form.get('event'))
+    addedEvents.append(request.form.get('event'))
+    response = aquantweb.response_class(
+            response=json.dumps({'data' : addedEvents}),
+            status=200,
+            mimetype='application/json',)
+    print(addedEvents)
+    return response
+
+
 
 
 

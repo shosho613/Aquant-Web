@@ -60,8 +60,7 @@ class Console_UI(object):
                     self.graph.change_connection_label(event.id,e.id,real_label)
 
     def run_algo(self):
-        for tree in self.graph.event_trees:
-            self.graph.observation_solution(tree)
+        self.graph.observation_solution()
         print(self.graph.obser_solutions)
     
     def write_to_csv(self):

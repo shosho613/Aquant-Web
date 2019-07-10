@@ -1,6 +1,7 @@
 import json
 from PDF_Parser import PDF_Parser
 from Graph import Graph
+from Event import Event
 import csv
 
 class JSON_Converter(object):
@@ -10,6 +11,7 @@ class JSON_Converter(object):
         self.graph = None
         self.json_rep = {}
         self.pdf_parser = None
+        self.nodeIds = {} # this dict keys the client-generated nodeID to the server side ID used 
     
     def create_parser(self, filename):
         self.pdf_parser = PDF_Parser(filename)
@@ -20,10 +22,11 @@ class JSON_Converter(object):
         print(pdf_parser.pdf_name)
         result_graph = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, page_num)
         self.graph = result_graph
+        self.graph.create_tree()
         return result_graph
     
-    def get_json_graph(self):
-        self.json_rep['nodes'] = []
+    def get_json_basic_graph(self):
+        self.json_rep['basic'] = []
         eventArrs = self.graph.get_connected_components()
         for events in eventArrs:
             print(events)
@@ -32,7 +35,7 @@ class JSON_Converter(object):
                 print(i)
                 child = self.graph.get_event(events[i])
                 parent = self.graph.get_event(events[i-1])
-                self.json_rep['nodes'].append({
+                self.json_rep['basic'].append({
                 'Name': "node" + str(child.id) ,
                 'content': child.content,
                 'eventtype': 'None',
@@ -42,7 +45,7 @@ class JSON_Converter(object):
             if i == 0:
                 child = self.graph.get_event(events[i])
 
-                self.json_rep['nodes'].append({
+                self.json_rep['basic'].append({
                 'Name': "node" + str(child.id) ,
                 'content': child.content,
                 'eventtype': 'None', 
@@ -52,32 +55,118 @@ class JSON_Converter(object):
         with open('data.txt', 'w') as outfile:  
             json.dump(self.json_rep, outfile)
     
+
+    def get_JSON_nodes(self):
+        self.json_rep['nodes'] = []
+        for event in self.graph.events:
+            idString = 'node' + str(event.id)
+            self.json_rep['nodes'].append({
+                "Name" : idString,
+                "Content" : event.content,
+                "eventtype" : event.type,
+            })
+
+    def convert_to_json_nodes(self,addedEvents):
+        id = self.graph.get_num_events() + 1
+        rep = []
+        print(addedEvents)
+        for event in addedEvents:
+            print(event)
+            if not (event == 'undefined' or event == ''):
+                self.graph.add_event(Event(id, event))
+                idString = 'node' + str(id)
+                rep.append({
+                    'Name' : idString,
+                    "Content" : event,
+                    "eventtype" : "N"
+                })
+                id += 1
+        return rep
+
+
+    def get_JSON_connectors(self):
+        self.json_rep['connectors'] = []
+        id = 0
+        for event in self.graph.events:
+            for e,w in event.get_connections().items():
+                sourceID = 'node' + str(event.id)
+                targetID = 'node' + str(e.id)
+                if w == 3:
+                    content ="Label!"
+                if w == 2:
+                    content = "Yes"
+                if w == 1:
+                    content = "No"
+                self.json_rep['connectors'].append({
+                    "id" : 'connector' + str(id),
+                    "sourceID" : sourceID,
+                    "targetID" : targetID,
+                    "content" : content
+                })
+                id += 1
+        
+    def get_json_graph(self):
+        self.graph.create_tree()
+        self.get_JSON_nodes()
+        self.get_JSON_connectors()
+        
+
+    
     def set_types(self, events):
         for event in events:
-            id = int(event['Name'].split('node')[1])
+            id = int(event['id'].split('node')[1])
             eventtype = 'N'
-            if str(event['eventtype']) == 'Observation':
+            if str(event['eventtype']) == 'O':
                 eventtype = 'O'
-            elif str(event['eventtype']) == 'Solution':
+            elif str(event['eventtype']) == 'S':
                 eventtype = 'S'
             self.graph.get_event(id).set_type(eventtype)
     
     def run_algo(self):
-        for tree in self.graph.event_trees:
-            self.graph.observation_solution(tree)
+        self.graph.get_connected_components()
+        self.graph.observation_solution()
         print(self.graph.obser_solutions)
     
     def create_csv(self):
         with open("output.csv", "w+") as csvfile:
             filewriter = csv.writer(csvfile)
             map = self.graph.obser_solutions
+            filewriter.writerow(["Observation", "Solution"])
             for o,solutions in map.items():
                 if solutions:
-                    to_write = []
-                    to_write.append(self.graph.get_event(o).get_content())
                     for s in solutions:
-                        to_write.append(self.graph.get_event(s).get_content())
-                    filewriter.writerow(to_write)
+                        filewriter.writerow([self.graph.get_event(o).get_content().replace('\n',''), self.graph.get_event(s).get_content().replace('\n','')])
+
+        return csv
+    
+    def add_nodes(self, stringArr):
+        currentID = 0
+        nodeArr = json.loads(stringArr)
+        self.graph = Graph(len(nodeArr))
+        for node in nodeArr:
+            id = currentID
+            self.nodeIds[node['id']] = id
+            currentID += 1
+            print(node['addInfo'][0])
+            event = Event(int(id), node['annotations'][0]['content'])
+            if node['addInfo'][0]['eventtype'] == 'O':
+                event.set_type('O')
+            elif node['addInfo'][0]['eventtype'] == 'S':
+                event.set_type('S')
+            else:
+                event.set_type('N')
+            self.graph.add_event(event)
+
+    def add_connections(self, stringArr):
+        connectionArr = json.loads(stringArr)
+        for c in connectionArr:
+            print(c)
+            sourceID = self.nodeIds[c['sourceID']]
+            targetID = self.nodeIds[c['targetID']]
+            self.graph.connect_events_from_id(sourceID,targetID, c['annotations'][0]['content'])
+
+
+
 
 
     
@@ -88,7 +177,7 @@ def main():
     jc.get_graph_from_filename("Rational Troubleshooting guide.pdf", 36)
     for i in jc.graph.get_events():
         print(repr(i))
-    jc.get_json_graph()
+    jc.get_json_basic_graph()
     print(json.dumps(jc.json_rep, indent=4))
 
 if __name__ == "__main__":

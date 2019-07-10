@@ -2,7 +2,14 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "devDependencies": {
+    "@pdftron/webviewer-downloader": "^1.0.7",
+    "btoa": "^1.2.1",
+    "download": "^7.1.0",
+    "fs-extra": "^7.0.1"
+  },
   "dependencies": {
+    "@react-pdf/renderer": "^1.6.3",
     "@syncfusion/ej2-base": "^17.1.49",
     "@syncfusion/ej2-buttons": "^17.1.50",
     "@syncfusion/ej2-data": "^17.1.51",
@@ -17,19 +24,28 @@
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "filepond": "^4.4.9",
+    "pdf-lib": "^0.6.3",
+    "pdf.js": "^0.1.0",
+    "pspdfkit": "https://customers.pspdfkit.com/npm/TRIAL-QVQWU-6p73k_z1I_PItOK6KBUrvSPe7t9xI2saCn3Fprtw9nmIW8wvSFI9NllvW2N43-uTh0H1mRno7W67KE6A/latest.tar.gz",
     "query-string": "^6.8.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-dropzone": "^10.1.5",
     "react-filepond": "^7.0.1",
+    "react-pdf": "^4.1.0",
+    "react-pdf-highlighter": "^2.2.0",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "simple-react-pdf": "^1.0.9",
+    "webviewer": "file:../../../../WebViewer"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "npm run download-webviewer",
+    "download-webviewer": "npx @pdftron/webviewer-downloader"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -2,6 +2,7 @@ import React from 'react';
 import { withRouter } from "react-router-dom";
 
 
+
 class Upload extends React.Component{
 
     constructor(props) {
@@ -9,6 +10,7 @@ class Upload extends React.Component{
         this.pagenum = null
         this.file = null
         this.handleUpload = this.handleUpload.bind(this)
+
     }
 
     handleUpload(){
@@ -28,6 +30,8 @@ class Upload extends React.Component{
       }).then(response => response.json())
       .then(response => {
         this.setState({data: response});
+
+
       }
       )
     }
@@ -46,7 +50,7 @@ class Upload extends React.Component{
                 history.push({
                 pathname: '/parser/',
                 search: stringified,
-                state: {pagenum: this.pagenum, file: this.file}
+                state: {pagenum: this.pagenum, file: this.file,}
                 })}}>
              Submit 
              </button>

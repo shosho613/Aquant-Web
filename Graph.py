@@ -3,26 +3,47 @@ import Event
 class Graph(object):
     def __init__(self,num_events):
         self.events = [None] * num_events
+        self.root_event = None
         self.contains_error = False
         self.obser_solutions = {} #key is observation, value is list of applicable solutions
         self.event_trees = []
 
 
     def add_event(self, event):
-        self.events[event.id] = event
+        if event.id > len(self.events):
+            print(len(self.events))
+            newArr = [None] * 2 * len(self.events)
+            for e in self.events:
+                if e is not None:
+                    newArr[e.id] = e
+            self.events = newArr
+            self.events[event.id] = event
+        else: 
+            self.events[event.id] = event
 
     def get_events(self):
         return self.events
     
+    def get_num_events(self):
+        result = 0
+        for e in self.events:
+            if e is not None:
+                result += 1
+        return result
     def get_event(self,id):
         return self.events[id]
-
+    
+    def set_root_event(self, root):
+        self.root_event = root
+        self.add_event(root)
+ 
 
     def print_graph(self):
         for i in self.events:
-            #temp = self.events[i]
-            print("ID %d: %s" % (i.get_id(), i.get_content()))
-            self.print_graph_helper(i.get_connections())
+            if i is not None:
+                #temp = self.events[i]
+                print("ID %d: %s" % (i.get_id(), i.get_content()))
+                self.print_graph_helper(i.get_connections())
 
     def print_graph_helper(self,events):
         for event,weight in events.items():
@@ -53,12 +74,14 @@ class Graph(object):
     def get_connected_components(self): 
         visited = [] 
         cc = [] 
-        for i in range(len(self.events)): 
-            visited.append(False) 
-        for event in self.events: 
-            if visited[event.id] == False: 
-                temp = [] 
-                cc.append(self.DFS_cc(temp, event.id, visited))
+        for i in range(len(self.events)):
+            if self.events[i] is not None:
+                visited.append(False) 
+        for event in self.events:
+            if event is not None:
+                if visited[event.id] == False: 
+                    temp = [] 
+                    cc.append(self.DFS_cc(temp, event.id, visited))
         self.event_trees = cc
         return cc
 
@@ -76,33 +99,54 @@ class Graph(object):
     #and every solution that can be reached using only yes connections
     def DFS(self, event_id,visited,temp):
         visited[event_id] = True
+        #print("this is the event id %d " % (event_id))
         event = self.events[event_id]
         for e in event.get_connections():
             if visited[e.id] is False and e.type is "S":
                 temp.append(e.id)
+                print("appended %d" %(e.id))
                 self.DFS(e.id, visited,temp)
             elif visited[e.id] is False:
                 self.DFS(e.id,visited,temp)
 
     #from src_event, @return list of all reachable nodes.
-    def reachable_events(self,src_id, tree_arr):
+    def reachable_events(self,src_id, tree_arr,visited):
         temp = []
-        visited = {}
+        print(src_id)
         for t in tree_arr:
             visited[t] = False
         event = self.get_event(src_id)
         for e in event.get_connections():
-            if visited[e.id] is False and event.get_weight(e) == 2 and e.type is "S":
+            print("connection %d" %(e.id))
+            if visited[e.id] is False and event.get_weight(e) == 2  and e.type is "S":
                 temp.append(e.id)
+                print("appended %d" %(e.id))
                 self.DFS(e.id, visited, temp)
             elif visited[e.id] is False and event.type is "O":
                 #temp.append(e.id)
+                print('got to elif')
                 self.DFS(e.id,visited,temp)
         return temp
 
-    def observation_solution(self,tree_arr):
-        for t in tree_arr:
-            self.obser_solutions[t] = self.reachable_events(t,tree_arr)
+    def observation_solution(self):
+        visited = {}
+        for tree in self.event_trees:
+            for t in tree:
+                visited[t] = False
+            for t in tree:
+                self.obser_solutions[t] = self.reachable_events(t,tree,visited)
+    
+    def create_tree(self):
+        self.root_event.set_type("O")
+        self.get_connected_components()
+        for tree in self.event_trees:
+            if tree[0] != self.root_event.id:
+                print(tree)
+                root = self.get_event(self.root_event.id)
+                self.connect_events_from_id(self.root_event.id, tree[0], "Yes")
+        print(repr(self.get_event(root.id)))
+
+
 
 
 
