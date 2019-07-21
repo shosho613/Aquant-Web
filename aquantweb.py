@@ -32,6 +32,7 @@ def home():
 @cross_origin()
 def upload_file():
     if request.method == 'POST':
+        del addedEvents[:]
         print(request.form)
         f = request.files.get("file")
         f.save(f.filename)
@@ -70,7 +71,7 @@ def get_graph():
         f = request.files.get("file")
         jc.get_graph_from_filename(f.filename,pagenum)
         jc.get_json_graph()
-        addedEvents = []
+        del addedEvents[:]
         response = aquantweb.response_class(
             response=json.dumps(jc.json_rep),
             status=200,
@@ -124,9 +125,9 @@ def download_csv():
         file = open('output.csv','r')
         return send_file('output.csv', mimetype='text/csv')
 
-@aquantweb.route('/addEventsFromPDF' , methods=['GET', 'POST'])
+@aquantweb.route('/addEventFromPDF' , methods=['GET', 'POST'])
 @cross_origin()
-def addEventsFromPDF():
+def addEventFromPDF():
     print(request.form.get('event'))
     addedEvents.append(request.form.get('event'))
     response = aquantweb.response_class(
@@ -136,6 +137,31 @@ def addEventsFromPDF():
     print(addedEvents)
     return response
 
+@aquantweb.route('/removeEventFromPDF' , methods=['GET', 'POST'])
+@cross_origin()
+def removeEventFromPDF():
+    print(request.form.get('event'))
+    addedEvents.remove(request.form.get('event'))
+    response = aquantweb.response_class(
+            response=json.dumps({'data' : addedEvents}),
+            status=200,
+            mimetype='application/json',)
+    print(addedEvents)
+    return response
+
+
+
+@aquantweb.route('/modifyEventFromPDF' , methods=['GET', 'POST'])
+@cross_origin()
+def modifyEventFromPDF():
+    #print(request.form.get('event'))
+    #addedEvents.remove(request.form.get('event'))
+    response = aquantweb.response_class(
+            response=json.dumps({'data' : addedEvents}),
+            status=200,
+            mimetype='application/json',)
+    print(addedEvents)
+    return response
 
 
 

@@ -1,4 +1,5 @@
 import json
+from new_parser import new_Parser
 from PDF_Parser import PDF_Parser
 from Graph import Graph
 from Event import Event
@@ -14,11 +15,12 @@ class JSON_Converter(object):
         self.nodeIds = {} # this dict keys the client-generated nodeID to the server side ID used 
     
     def create_parser(self, filename):
-        self.pdf_parser = PDF_Parser(filename)
+        self.pdf_parser = new_Parser(filename)
         print(self.pdf_parser.pdf_name)
     
     def get_graph_from_filename(self,pdf_name, page_num):
         pdf_parser = PDF_Parser(pdf_name)
+        #pdf_parser = new_Parser(pdf_name)
         print(pdf_parser.pdf_name)
         result_graph = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, page_num)
         self.graph = result_graph
@@ -59,12 +61,13 @@ class JSON_Converter(object):
     def get_JSON_nodes(self):
         self.json_rep['nodes'] = []
         for event in self.graph.events:
-            idString = 'node' + str(event.id)
-            self.json_rep['nodes'].append({
-                "Name" : idString,
-                "Content" : event.content,
-                "eventtype" : event.type,
-            })
+            if event is not None:
+                idString = 'node' + str(event.id)
+                self.json_rep['nodes'].append({
+                    "Name" : idString,
+                    "Content" : event.content,
+                    "eventtype" : event.type,
+                })
 
     def convert_to_json_nodes(self,addedEvents):
         id = self.graph.get_num_events() + 1
@@ -88,22 +91,23 @@ class JSON_Converter(object):
         self.json_rep['connectors'] = []
         id = 0
         for event in self.graph.events:
-            for e,w in event.get_connections().items():
-                sourceID = 'node' + str(event.id)
-                targetID = 'node' + str(e.id)
-                if w == 3:
-                    content ="Label!"
-                if w == 2:
-                    content = "Yes"
-                if w == 1:
-                    content = "No"
-                self.json_rep['connectors'].append({
-                    "id" : 'connector' + str(id),
-                    "sourceID" : sourceID,
-                    "targetID" : targetID,
-                    "content" : content
-                })
-                id += 1
+            if event is not None:
+                for e,w in event.get_connections().items():
+                    sourceID = 'node' + str(event.id)
+                    targetID = 'node' + str(e.id)
+                    if w == 3:
+                        content ="Label!"
+                    if w == 2:
+                        content = "Yes"
+                    if w == 1:
+                        content = "No"
+                    self.json_rep['connectors'].append({
+                        "id" : 'connector' + str(id),
+                        "sourceID" : sourceID,
+                        "targetID" : targetID,
+                        "content" : content
+                    })
+                    id += 1
         
     def get_json_graph(self):
         self.graph.create_tree()
@@ -133,8 +137,12 @@ class JSON_Converter(object):
             map = self.graph.obser_solutions
             filewriter.writerow(["Observation", "Solution"])
             for o,solutions in map.items():
-                if solutions:
+                print(self.graph.get_event(o))
+                if len(solutions) > 0 :
+                    print(solutions)
                     for s in solutions:
+                        print(self.graph.get_event(o))
+                        print(self.graph.get_event(s))
                         filewriter.writerow([self.graph.get_event(o).get_content().replace('\n',''), self.graph.get_event(s).get_content().replace('\n','')])
 
         return csv

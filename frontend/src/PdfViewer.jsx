@@ -61,7 +61,7 @@ class PdfViewer extends React.Component {
           console.log(annotations[0].getContents())
           var data = new FormData()
           data.append('event', annotations[0].getContents())
-          fetch('http://localhost:5000/addEventsFromPDF', {
+          fetch('http://localhost:5000/addEventFromPDF', {
               method: 'POST',
               body: data,
               headers:{
@@ -72,8 +72,19 @@ class PdfViewer extends React.Component {
             //response => alert("added [responses]. Click Apply Changes to See.")
           )
         } else if (action === 'modify') {
+         
           console.log('this change modified annotations');
         } else if (action === 'delete') {
+          var data = new FormData()
+          data.append('event', annotations[0].getContents())
+          fetch('http://localhost:5000/removeEventFromPDF', {
+              method: 'POST',
+              body: data,
+              headers:{
+                "Access-Control-Allow-Origin" : "*", 
+                "Access-Control-Allow-Credentials" : true,
+              }
+          })
           console.log('there were annotations deleted');
         }
       })
@@ -95,7 +106,7 @@ class PdfViewer extends React.Component {
   render(){
     return (
       <div>
-      <div className="webviewer" style={{height: "1000px"}} ref={this.viewer}></div>
+      <div className="webviewer" style={{height: "750px"}} ref={this.viewer}></div>
       </div>
 
     );

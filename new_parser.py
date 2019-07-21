@@ -5,16 +5,18 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
+from Event import Event
+from Graph import Graph
 
 class Arrow(object):
 
     def __init__(self, arrow):
-        self.arrow_obj = arrow
+        self.obj = arrow
         self.label = None
         self.source = None
         self.dest = None
         self.connected_to = None #if leading to another arrow
-    
+        self.direction = None #direction arrow is leading from
 
     def set_label(self, label):
         self.label = label
@@ -37,6 +39,7 @@ class new_Parser(object):
         self.arrow_labels = []
         self.root_event = None
         self.pdf_name = pdf_name
+        self.graph = None
     
 
     def with_pdf(self, fn, *args):
@@ -58,7 +61,7 @@ class new_Parser(object):
             print("IOError")
             pass
         return result
-    
+
 
     def getLayout(self,doc, pagenum):
         rsrcmgr = PDFResourceManager()
@@ -107,8 +110,8 @@ class new_Parser(object):
                 rect2 = self.rects[j]
                 if rect1 is not None and rect2 is not None:
                     if rect1.x0 == rect2.x0 and rect1.x1 == rect2.x1 and rect1.y0 == rect2.y0 and rect1.y1 == rect2.y1 and j != i :
-                        print("this is i: %d" % (i))
-                        print("this is j: %d" % (j))
+                        #print("this is i: %d" % (i))
+                        #print("this is j: %d" % (j))
                         self.rects[j] = None
         for rect in self.rects:
             if rect is None:
@@ -117,64 +120,78 @@ class new_Parser(object):
 
     # find the text content in boxes
     def recognize_textboxes(self):
-        print(self.boxes)
+        #print(self.boxes)
         id = 0
         for rect in self.rects:
-            print(rect)
+            #print(rect)
             box_content = ""
             for box in self.boxes:
                 for line in box:
                     if self.isTextLine_inRect(rect,
                                          line):  # compare the boundaries of the rectangle to each textline within textbox
                         box_content += line.get_text()  # if so, add to box_content
-                        print("added, box content is now %s" % (box_content))
+                        #print("added, box content is now %s" % (box_content))                        
+                
+
             if box_content != "":
                 #self.rects.remove(rect)
-                print("box xontent is %s" % (box_content))
-                self.rect_content[rect] = box_content
-    
+                #print("box xontent is %s" % (box_content))
+                self.rect_content[rect] = Event(id,box_content)
+                id+=1
+        self.root_event = Event(id, self.boxes[0].get_text())
+                
+       
+
+
     def add_connections(self):
         print(len(self.arrows))
         self.set_arrow_sources()
         self.set_arrow_connections()
         self.set_arrow_destination()
         for arrow in self.arrows:
-            result = self.trace_arrow_src(arrow)
-            if result is not None:
-                print(result)
-                print(arrow)
-                print("with content %s" % (self.rect_content[result[0]]))
-                arrow_connected = self.is_arrow_connected(arrow)
-                print(arrow_connected)
-                if arrow_connected is None:
-                    rect = self.trace_arrow_dst(arrow, result[1])
-                    print(rect)
-                    if rect is not None:
-                        print(self.rect_content[rect])
-                    else: print(None)
-
-                else:
-                    rect = self.trace_arrow_dst(arrow_connected, result[1])
-                    print(rect)
-                    if rect is not None:
-                        print(self.rect_content[rect])
-                    else: print(None)
+            if arrow.source is not None and arrow.dest is not None:
+                print("here")
+                print(self.rect_content[arrow.source])
+                print(arrow.direction)
+                print(arrow.obj)
+                #print("Label:")
+                #print(arrow.label)
+                print("------------")
+                print(self.rect_content[arrow.dest])
     
+    #to do: organize vertical labels.  
     def set_arrow_sources(self):
         for arrow in self.arrows:
-            src_rect = self.trace_arrow_src(arrow)
-            arrow.set_source(src_rect)
+            
+            src_tuple = self.trace_arrow_src(arrow.obj)
+            
+            if src_tuple is not None:
+                print(src_tuple)
+                arrow.set_source(src_tuple[0])
+                arrow.direction = src_tuple[1]
     
     def set_arrow_connections(self):
         for arrow in self.arrows:
-            arrow_connect = self.is_arrow_connected(arrow)
+            arrow_connect = self.is_arrow_connected(arrow.obj)
             if arrow_connect is not None:
-                arrow.connected_to = arrow_connect
+                arrow.connected_to = Arrow(arrow_connect)
     
     def set_arrow_destination(self):
         for arrow in self.arrows:
-            dst_rect = self.trace_arrow_dst(arrow)
-            arrow.set_source(src_rect)
+            if arrow.connected_to is None:
+                dst_rect = self.trace_arrow_dst(arrow.obj, arrow.direction)
+                arrow.set_dest(dst_rect)
+                label = self.get_arrow_label(arrow.obj)
+                if label is not None:
+                    arrow.label = label
+                
+            else:
+                dst_rect = self.trace_arrow_dst(arrow.connected_to.obj, arrow.direction)
+                arrow.set_dest(dst_rect)
+                label = self.get_arrow_label(arrow.obj)
+                if label is not None:
+                    arrow.label = label
+
 
     #this will trace arrow to its destination coordinates, and return the rectangle if it points to one, or return a arrow if it points to one
     def trace_arrow_dst(self,arrow, direction):
@@ -227,24 +244,31 @@ class new_Parser(object):
     def is_arrow_connected(self,arrow):
         dstX = arrow.x1
         dstY = arrow.y1
-        proximity = 50
+        Xproximity = 40
+        Yproximity = 50
         arrow_connected = None
-        for a in self.arrows:
-            #print(a)
+        for arr in self.arrows:
+            a = arr.obj
             if not(a.x1 == arrow.x1 and a.x0 == arrow.x0 and a.y0 == arrow.y0 and a.y1 == arrow.y1):
                 #print("here")
                 if a.y0 < dstY < a.y1:
-                    print(dstX-a.x0)
-                    if 0 < dstX- a.x0 < proximity:
-                        proximity = dstX - a.x0
+                    #print(dstX-a.x0)
+                    if 0 < dstX- a.x0 < Xproximity:
+                        Xproximity = dstX - a.x0
                         arrow_connected = a
+                elif a.x0 < dstX < a.x1:
+                    if 0 < a.y0 - dstY < Yproximity:
+                        Yproximity =  a.y0 - dstY
+                        arrow_connected = a
+                
+        if arrow_connected is None:
+            return None
+        elif arrow_connected is not None:
+            #print("found connected")
+            self.is_arrow_connected(arrow_connected)
         return arrow_connected
 
 
-
-
-        
-        
 
 
 
@@ -298,14 +322,57 @@ class new_Parser(object):
         self.categorize_layout(doc, pagenum)
         self.remove_duplicate_rects()
         self.recognize_textboxes()
-        self.add_connections()
-        return self.rect_content
+        #self.process_labels()
 
+        self.add_connections()
+        G = Graph(len(self.rect_content.values()) + 1)
+        print(len(self.rect_content.values()))
+        #G.set_root_event(self.root_event)
+        print(repr(G.root_event))
+        for arrow in self.arrows:
+            if arrow.source is not None and arrow.dest is not None:
+                source_event = self.rect_content[arrow.source]
+                dst_event = self.rect_content[arrow.dest]
+                source_event.add_connection(dst_event, arrow.label)
+        for value_tuple in self.rect_content.values():
+            G.add_event(value_tuple)
+        return G
+
+    #return true if given arrow is closest to given line
+    @staticmethod
+    def textline_labels_arrow(line, curve, h_proximity, y_proximity):
+        return new_Parser.arrow_labels_horizontally(line,curve,h_proximity) or new_Parser.arrow_labels_vertically(line,curve,y_proximity)
+
+    @staticmethod
+    def arrow_labels_horizontally(line, curve, proximity):
+        return proximity > line.x0 - curve.x0 > 0 and (line.y1 > curve.y1 or curve.y0 > line.y0)
+
+    @staticmethod
+    def arrow_labels_vertically(line,curve,proximity):
+        return proximity > line.y0 - curve.y0 > 0 and (line.x1 > curve.x1 or curve.x0 > line.x0)
+
+    # given an arrow, return str of its label
+    def get_arrow_label(self,curve):
+        closest_label = None
+        h_proximity = 20
+        y_proximity = 20
+        for label in self.arrow_labels:
+            if new_Parser.textline_labels_arrow(label, curve,h_proximity, y_proximity):
+                closest_label = label
+                h_proximity = label.x0 - curve.x0
+                y_proximity = label.y0 - curve.y0
+        if closest_label is not None:
+            str = closest_label.get_text()
+            self.arrow_labels.remove(closest_label)
+            return str
+        else: return None
 def main():
     pdf_parser = new_Parser("ComplexTree.pdf")
     print(pdf_parser.pdf_name)
     result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, 60)
-    print(len(result))
+    print("printing graph")
+    for event in result.events:
+        print(repr(event))
 
 
 

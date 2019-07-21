@@ -137,14 +137,16 @@ class Graph(object):
                 self.obser_solutions[t] = self.reachable_events(t,tree,visited)
     
     def create_tree(self):
-        self.root_event.set_type("O")
+        if self.root_event is not None:
+            self.root_event.set_type("O")
         self.get_connected_components()
         for tree in self.event_trees:
-            if tree[0] != self.root_event.id:
-                print(tree)
-                root = self.get_event(self.root_event.id)
-                self.connect_events_from_id(self.root_event.id, tree[0], "Yes")
-        print(repr(self.get_event(root.id)))
+            if self.root_event is not None:
+                if tree[0] != self.root_event.id:
+                    print(tree)
+                    root = self.get_event(self.root_event.id)
+                    self.connect_events_from_id(self.root_event.id, tree[0], "Yes")
+       # print(repr(self.get_event(root.id)))
 
 
 

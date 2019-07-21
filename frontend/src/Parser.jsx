@@ -1,13 +1,13 @@
 import React from 'react';
 import DiagFlow from './DiagFlow';
+import TextRep from './TextRep';
 import PdfViewer  from './PdfViewer';
-import PDFJSBackend from './pdfjs';
-import WebviewerBackend from './webviewer';
-import { withRouter, Route } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 
 
 
+/**Parent Component of Parser Page, houses the diagram flowcharting component and the pdf viewer component */
 class Parser extends React.Component {
   
   constructor(props){
@@ -43,6 +43,7 @@ class Parser extends React.Component {
 
  
   render(){
+    /** loads same parser component with the next page in the pdf file as input to parse. */
     const NextPage = withRouter(({history}) => (
       <button type="submit" className="btn btn-primary p-3" onClick={()=>{
         var newPage = parseInt(this.state.pagenum) + 1
@@ -63,7 +64,8 @@ class Parser extends React.Component {
        </button>
 
     ))
-
+    
+    /** sends user back to the home page */
     const BackHome = withRouter(({history}) => (
       <img src="https://pbs.twimg.com/media/Dn88s1aWsAAF4fH.png" width="200" height="150"alt="" onClick={() =>{
         history.push({
@@ -96,6 +98,7 @@ class Parser extends React.Component {
       <div className="row"> 
         <div className="col-lg-7">
           <DiagFlow file={this.file} pagenum={this.state.pagenum} hasPdf ={true}/>
+          <TextRep file={this.file} pagenum={this.state.pagenum}/>
         </div>
         <div className="col-lg-5">
         <PdfViewer file={this.file} pagenum={this.state.pagenum}/>

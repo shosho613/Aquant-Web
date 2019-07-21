@@ -26,17 +26,25 @@ class Event(object):
         if len(self.connected_events) == None:
             return 0
         else: return len(self.connected_events)
+    
+    def equals(self,event):
+        if self.id == event.id: return True
+        else: return False
 
     def add_connection(self, event,connection_type):
-        if connection_type == None:
-            self.connected_events[event] = 3
-            print("added event with NONE connection %s" % (event))
-        elif "Yes" == re.sub("\s+", "", connection_type):
-            self.connected_events[event] = 2
-            print("added event with yes connection %s" % (event))
-        elif "No" == re.sub("\s+", "", connection_type):
-            self.connected_events[event] = 1
-            print("added event with no connection %s" % (event))
+        if not self.equals(event):
+            if connection_type == None:
+                self.connected_events[event] = 3
+                print("%d added event %d with NONE connection %s" % (self.id, event.id, event))
+            elif "Yes" == re.sub("\s+", "", connection_type):
+                self.connected_events[event] = 2
+                print("added event with yes connection %s" % (event))
+            elif "No" == re.sub("\s+", "", connection_type):
+                self.connected_events[event] = 1
+                print("added event with no connection %s" % (event))
+            else:
+                self.connected_events[event] = 3
+                print("added event with NONE connection %s" % (event))
     
     def remove_connection(self,event):
         self.connected_events.pop(event)

@@ -1,10 +1,11 @@
 import * as React from "react";
 import './DiagFlow.css'
 import { ToolbarComponent } from '@syncfusion/ej2-react-navigations';
-import { DataManager } from "@syncfusion/ej2-data";
-import { HierarchicalTree, DataBinding, DiagramComponent,KeyModifiers, Keys, Inject, SelectorConstraints, SymbolPaletteComponent, SnapConstraints, Connector } from "@syncfusion/ej2-react-diagrams";
+import { HierarchicalTree, DataBinding, DiagramComponent, Inject, SymbolPaletteComponent, Connector, SnapConstraints } from "@syncfusion/ej2-react-diagrams";
 import SolutionTool from './SolutionTool';
 import ObservationTool from './ObservationTool';
+
+/** class compenent dealing with interactive diagram flowchart */
 export class DiagFlow extends React.Component {
 
     constructor(props){
@@ -12,18 +13,19 @@ export class DiagFlow extends React.Component {
         this.pagenum = props.pagenum
         this.file = props.file
         console.log(this.file)
-        this.hasPdf = props.hasPdf
+        this.hasPdf = props.hasPdf // if diagflow is used as a representation for pdf parsing, its True
+        /**state handles the existing nodes and connectors */
         this.state ={
              nodes : [
                 {
-                    id: "industry",
+                    id: "n1",
                     offsetX: 280,
                     offsetY: 250,
                     annotations: [{ content: "" }],
                     addInfo : [{'eventtype' : ''}]
                 },
                 {
-                    id: "potential",
+                    id: "n2",
                     offsetX: 280,
                     offsetY: 110,
                     annotations: [{ content: "" }],
@@ -37,8 +39,8 @@ export class DiagFlow extends React.Component {
              connectors : [
                 {
                     id: "connector1",
-                    sourceID: "potential",
-                    targetID: "industry"
+                    sourceID: "n1",
+                    targetID: "n2",
                 },
             ]
                 
@@ -49,7 +51,6 @@ export class DiagFlow extends React.Component {
         this.new_annots = false
         this.downloadCSV = this.downloadCSV.bind(this);
         this.saveAsFile = this.saveAsFile.bind(this);
-        this.getBasicJSON = this.getBasicJSON.bind(this);
         this.getGraphRep = this.getGraphRep.bind(this);
         this.convertNodes = this.convertNodes.bind(this);
 		this.convertConnectors = this.convertConnectors.bind(this);
@@ -62,7 +63,8 @@ export class DiagFlow extends React.Component {
             this.getGraphRep()
         }
 	}
-	
+    
+    /** returns the ports to enable connecting and disconecting connectors */
 	getPorts(node){
 		let ports = [
 			{ id: "port1", shape: "Circle", offset: { x: 0, y: 0.5 } },
@@ -74,28 +76,7 @@ export class DiagFlow extends React.Component {
 
 	}
 
-
-    getBasicJSON(){
-        fetch('http://localhost:5000/GetBasicGraph', {
-        method: 'GET',
-        headers:{
-          "Access-Control-Allow-Origin" : "*", 
-          "Access-Control-Allow-Credentials" : true,
-        }
-      }).then(response => response.json())
-      .then(response => {
-        console.log(this.state.data)
-        let exports = Object();
-        Object.defineProperty(exports, "__esModule", { value: true });
-        console.log(response)
-        exports.data = response['basic']
-        console.log(exports.data)
-        this.setState({data : exports.data})
-  
-      }
-      )
-    }
-
+    /** @return an array that is compliant with diagram API, from what JSON format returns as. */
     convertNodes(array){
         var result = []
         for (var i in array){
@@ -107,6 +88,9 @@ export class DiagFlow extends React.Component {
         }
         return result
     }
+
+
+    /** @return an array that is compliant with diagram API, from what JSON format returns as. */
 
     convertConnectors(array){
         var result = []
@@ -123,6 +107,7 @@ export class DiagFlow extends React.Component {
         return result
     }
 
+    /** retrieves and sets state of PDF tree representation  */
     getGraphRep(){
         var data = new FormData()
         data.append('pagenum', this.pagenum)
@@ -150,6 +135,7 @@ export class DiagFlow extends React.Component {
       )
     }
 
+    /** gets all annotations from server, adds them to addedEvents array and sets has_annotations to True */
     getAnnotationsAsEvents = () =>{
         var data = new FormData()
         console.log(this.state.nodes.length)
@@ -163,13 +149,17 @@ export class DiagFlow extends React.Component {
         }
       }).then(response => response.json())
       .then(response => {
-          this.addedEvents = response
+          /*this.addedEvents = response
           console.log(this.addedEvents)
+          this.new_annots = true*/
+          var addedNodes = this.convertNodes(response)
+          this.addedEvents = addedNodes
           this.new_annots = true
       })
 
     }
 
+    /**fetches csv created in server, downloads to client */
     downloadCSV(){
         var data = new FormData()
         data.append('nodes', JSON.stringify(this.state.nodes))
@@ -213,7 +203,8 @@ export class DiagFlow extends React.Component {
         let targetDropdown;
         let toolbarObj;
         let dialogInstance;
-        let handles = [{
+        
+        let handles = [{ //sets user buttons on each diagram element
             name: 'solution',
             pathData: 'M60.3,18H27.5c-3,0-5.5,2.4-5.5,5.5v38.2h5.5V23.5h32.7V18z M68.5,28.9h-30c-3, 0-5.5,2.4-5.5,5.5v38.2c0,3,2.4,5.5,5.5,5.5h30c3,0,5.5-2.4,5.5-5.5V34.4C73.9,31.4,71.5,28.9,68.5,28.9z M68.5,72.5h-30V34.4h30V72.5z',
             visible: true,
@@ -245,6 +236,7 @@ export class DiagFlow extends React.Component {
         }
         ]
 
+        //sets template icons for draggable pallettes
         let flowshapes = [
             {id : 'Process', shape: { type: "Flow", shape: "Process"}}
         ]
@@ -260,6 +252,7 @@ export class DiagFlow extends React.Component {
             },
         ]
 
+        //only show the add PDF Annotations if used in the parse from PDF option
         const AddPDFButton = () => {
             if(this.hasPdf){
                 return(
@@ -277,7 +270,7 @@ export class DiagFlow extends React.Component {
 			<div className="control-pane font-size:larger">
 				<div className="control-section">
                 <AddPDFButton/>
-				<button className="btn btn-success" onClick={ ()=>{
+				<button className="btn btn-success" onClick={ ()=>{ //Applying changes done on clientside to diagram API
 						var nodeArr = []
 						var connectorArr = []
 						for(var i in diagramInstance.nodes){
@@ -288,17 +281,14 @@ export class DiagFlow extends React.Component {
 							})
 
                         }
-                        if (this.new_annots === true){ 
-                            console.log(nodeArr)
+
+                        //now add the pdf highlights as nodes, if present.
+                        if(this.new_annots){
                             for(var a in this.addedEvents){
-                                console.log(this.addedEvents[a])
-                                nodeArr.push({
-                                    id : this.addedEvents[a].Name,
-                                    annotations : [{content : this.addedEvents[a].Content}],
-                                    addInfo : [{eventtype : this.addedEvents[a].eventtype}]
-                                })
+                                nodeArr.push(this.addedEvents[a])
                             }
-                        }       
+                        }
+                            
                         console.log(nodeArr)
 						for(var c in diagramInstance.connectors){
 							connectorArr.push({
@@ -309,20 +299,22 @@ export class DiagFlow extends React.Component {
 							})
 
                         }
-                        this.new_annots = false
 						this.setState({nodes : nodeArr, connectors : connectorArr})
 						console.log(this.state.nodes)
                         console.log(this.state.connectors)
+                        this.new_annots = false
                     
-					}}>Apply Edits</button>
-					<button type="submit" className="btn btn-primary" onClick={this.downloadCSV}>Get Results</button>
-                    <ToolbarComponent id='toolbar' ref={toolbar => (toolbarObj = toolbar)} items={[
-            {
-                tooltipText: 'Delete',
-                prefixIcon: 'e-ddb-crudicons e-delete',
-                id: 'Delete',
-                text: 'Delete'
-            }
+					}}>Apply Edits (Refresh Diagram)</button>
+					<button type="submit" className="btn btn-primary" onClick={this.downloadCSV}>Get Results</button> 
+
+                    <ToolbarComponent id='toolbar' ref={toolbar => (toolbarObj = toolbar)} items={[ // handles the deletion of client side elements. 
+                                                                                                    //Only gets updated server-side when apply edits button is triggered
+                    {
+                        tooltipText: 'Delete',
+                        prefixIcon: 'e-ddb-crudicons e-delete',
+                        id: 'Delete',
+                        text: 'Delete'
+                    }
         ]} clicked={(args) => {
             let selectedItem;
             if (diagramInstance.selectedItems.nodes.length > 0) {
@@ -362,7 +354,7 @@ export class DiagFlow extends React.Component {
 									iconCss: "e-diagram-icons1 e-diagram-connector",
 									title: "Add Connectors"
 								}
-							]} width={"100%"} height={"700px"} symbolHeight={60} symbolWidth={60} getNodeDefaults={(symbol) => {
+							]} width={"20%%"} height={"700px"} symbolHeight={60} symbolWidth={60} getNodeDefaults={(symbol) => {
 								if (symbol.id === "Process") {
 									symbol.width = 80;
 									symbol.height = 40;
@@ -370,15 +362,17 @@ export class DiagFlow extends React.Component {
 							}} symbolMargin={{ left: 0, right: 0, top: 0, bottom: 0 }} getSymbolInfo={(symbol) => {
 								return { fit: true };
 							}}/>
+                           
+
 					</div>
 					<div id="diagram-space" className="sb-mobile-diagram">
-					<DiagramComponent id="diagram" ref={diagram => (diagramInstance = diagram)}  nodes={this.state.nodes} connectors ={this.state.connectors} width={"100%"} height={1000} 
+					<DiagramComponent id="diagram" ref={diagram => (diagramInstance = diagram)}  nodes={this.state.nodes} connectors ={this.state.connectors} width={"100%"} height={750} 
 							selectedItems ={{
                                 
 								userHandles: handles
 							}}
-							snapSettings={{  horizontalGridlines: null,
-                                verticalGridlines: null}}
+                            snapSettings={{constraints: SnapConstraints.HideLines}}
+                            
 							getCustomTool={(action) => {
                                 let tool;
                                // handles[1]["visible"] = false
@@ -403,7 +397,8 @@ export class DiagFlow extends React.Component {
 								type: "HierarchicalTree",
 								horizontalSpacing: 40,
 								verticalSpacing: 40,
-								orientation: "TopToBottom",
+                                orientation: "TopToBottom",
+                                enableAnimation: true,
 								margin: { left: 10, right: 0, top: 50, bottom: 0 }
 							} //Configrues hierarchical tree layout
 							} getNodeDefaults={(obj) => {
@@ -476,6 +471,7 @@ export class DiagFlow extends React.Component {
 							>
 								<Inject services={[DataBinding, HierarchicalTree ]}/>
 								</DiagramComponent>
+
 
 					</div>
 				</div>

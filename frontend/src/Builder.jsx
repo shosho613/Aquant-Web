@@ -1,6 +1,6 @@
 import React from 'react'
 import DiagFlow from './DiagFlow'
-import { withRouter, Route } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 
 class Builder extends React.Component{

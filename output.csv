@@ -1,28 +1,15 @@
-"Sticker over row of 12 relais
-42.00.260
-fully equipped PCB
-","Connect plug 40.04.180 to X20 
-","Check fuses on pcb  
-(2A slow - 3019.0120)
-","Check connections 12V DC to SSR
-"
-"Plug with wire link on X20 existing?
-Electric units only!
-","Check fuses on pcb  
-(2A slow - 3019.0120)
-","Check connections 12V DC to SSR
-"
-"Check fuses on pcb  
-(2A slow - 3019.0120)
-","Check connections 12V DC to SSR
-"
-"Sticker over row of 11 relais
-42.00.261
-partially equipped PCB
-(Plug X20 is not needed)
-","Check connections 12V DC to SSR
-"
-"Check if fan motor LED is blinking
-","Refer to LED blink code motor error 
-Change motor if required
-"
+Observation,Solution
+Display has coloured background,Change 30 pol cable 40.03.516Display ok?
+Display has coloured background,Change 30 pol cable back and change Interface Board A1 42.00.081
+Display has coloured background,Change Interface Board A1 back and change main PCB A2 42.00.261
+"Display is black or white , no icons are shown",Change 30 pol cable 40.03.516
+"Display is black or white , no icons are shown",Change display TFT  42.00.112
+"Display is black or white , no icons are shown",Change interface PCB  42.00.081
+Beep is audible when touch is pressed,Change 30 pol cable 40.03.516
+Beep is audible when touch is pressed,Change display TFT  42.00.112
+"SCC_WE display, coloured, instable",Change 30 pol cable 40.03.516Display ok?
+"SCC_WE display, coloured, instable",Change 30 pol cable back and change Interface Board A1 42.00.081
+"SCC_WE display, coloured, instable",Change Interface Board A1 back and change main PCB A2 42.00.261
+"SCC_WE display, coloured, instable",Change 30 pol cable 40.03.516
+"SCC_WE display, coloured, instable",Change display TFT  42.00.112
+"SCC_WE display, coloured, instable",Change interface PCB  42.00.081

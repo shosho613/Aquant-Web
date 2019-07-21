@@ -57,7 +57,7 @@ class Upload extends React.Component{
 
           ))
         return (
-            <form>
+            <form autoComplete="off">
             <div>
               <input ref={(ref) => { this.uploadInput = ref; }} type="file"/>
             </div>
