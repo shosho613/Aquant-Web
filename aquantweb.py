@@ -79,6 +79,24 @@ def get_graph():
         print(response)
         return response
 
+
+@aquantweb.route('/GetRawGraph', methods=["GET", "POST"])
+@cross_origin()
+def get_raw_graph():
+    if request.method == 'POST':
+        print(pdfFile)
+        pagenum = int(request.form.get("pagenum"))
+        f = request.files.get("file")
+        jc.get_graph_from_filename(f.filename,pagenum)
+        result = jc.get_raw_graph()
+        del addedEvents[:]
+        response = aquantweb.response_class(
+            response=json.dumps(result),
+            status=200,
+            mimetype='application/json',)
+        print(response)
+        return response
+
 @aquantweb.route('/GetAnnots', methods = ['GET', 'POST'], )
 @cross_origin()
 def get_annots():

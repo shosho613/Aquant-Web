@@ -113,7 +113,29 @@ class JSON_Converter(object):
         self.graph.create_tree()
         self.get_JSON_nodes()
         self.get_JSON_connectors()
-        
+    
+    def get_raw_graph(self):
+        self.graph.create_tree()
+        result = []
+        for event in self.graph.events:
+            result.append({
+                "id" : str(event.id),
+                "content" : str(event.content),
+                "eventtype" : str(event.type),
+                "connections" : self.get_event_rep(event.get_connections())
+            })
+        return result
+
+    def get_event_rep(self, events):
+        result = []
+        for event in events:
+            result.append({
+                "id" : str(event.id),
+                "content" : str(event.content),
+                "eventtype" : str(event.type),
+            })
+        return result
+
 
     
     def set_types(self, events):
@@ -141,10 +163,12 @@ class JSON_Converter(object):
                 if len(solutions) > 0 :
                     print(solutions)
                     for s in solutions:
-                        print(self.graph.get_event(o))
-                        print(self.graph.get_event(s))
-                        filewriter.writerow([self.graph.get_event(o).get_content().replace('\n',''), self.graph.get_event(s).get_content().replace('\n','')])
-
+                        try:
+                            print(self.graph.get_event(o))
+                            print(self.graph.get_event(s))
+                            filewriter.writerow([self.graph.get_event(o).get_content().replace('\n',''), self.graph.get_event(s).get_content().replace('\n','')])
+                        except UnicodeError:
+                            pass
         return csv
     
     def add_nodes(self, stringArr):
@@ -168,10 +192,13 @@ class JSON_Converter(object):
     def add_connections(self, stringArr):
         connectionArr = json.loads(stringArr)
         for c in connectionArr:
-            print(c)
-            sourceID = self.nodeIds[c['sourceID']]
-            targetID = self.nodeIds[c['targetID']]
-            self.graph.connect_events_from_id(sourceID,targetID, c['annotations'][0]['content'])
+            try:
+                print(c)
+                sourceID = self.nodeIds[c['sourceID']]
+                targetID = self.nodeIds[c['targetID']]
+                self.graph.connect_events_from_id(sourceID,targetID, c['annotations'][0]['content'])
+            except Exception as e: 
+                print(e)
 
 
 

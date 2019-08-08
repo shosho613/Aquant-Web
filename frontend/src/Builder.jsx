@@ -1,8 +1,9 @@
 import React from 'react'
 import DiagFlow from './DiagFlow'
 import { withRouter } from "react-router-dom";
+import TextRep from './TextRep';
 
-
+/** Build from scratch component */
 class Builder extends React.Component{
 
     render(){
@@ -32,6 +33,7 @@ class Builder extends React.Component{
                 </div>
         </div>
                 <DiagFlow hasPdf={false}/>
+            <TextRep file={null} pagenum={null}/>
             </div>
         );
     }

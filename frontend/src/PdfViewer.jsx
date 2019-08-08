@@ -1,3 +1,5 @@
+/** PdfViewer component: uses PDFTron and Webviewer libraries to view and interact with pdfs. */
+
 import React from 'react';
 class PdfViewer extends React.Component {
   constructor(props) {
@@ -46,7 +48,7 @@ class PdfViewer extends React.Component {
       
       
 
-      // or from the docViewer instance
+      //delete all existing annotations
       this.docViewer.on('annotationsLoaded', () => {
         console.log('annotations loaded');
         var annotList = this.annotManager.getAnnotationsList()
@@ -55,9 +57,9 @@ class PdfViewer extends React.Component {
         console.log(annotList[a])
       }
       });
-
+      //now listen for any additions,modifications, or deletions in highlights/annotations
       this.annotManager.on('annotationChanged',  (event, annotations, action) => {
-        if (action === 'add') {
+        if (action === 'add') {//if we add, post to server the content of highlight
           console.log(annotations[0].getContents())
           var data = new FormData()
           data.append('event', annotations[0].getContents())
@@ -74,7 +76,7 @@ class PdfViewer extends React.Component {
         } else if (action === 'modify') {
          
           console.log('this change modified annotations');
-        } else if (action === 'delete') {
+        } else if (action === 'delete') { //send the content of the deleted annotation so we can delete from server as well.
           var data = new FormData()
           data.append('event', annotations[0].getContents())
           fetch('http://localhost:5000/removeEventFromPDF', {
@@ -88,7 +90,7 @@ class PdfViewer extends React.Component {
           console.log('there were annotations deleted');
         }
       })
-      this.docViewer.on('documentLoaded', () =>{
+      this.docViewer.on('documentLoaded', () =>{ // when document loads, go to page chosen by user
         for(var i = 1; i < this.initialPage; i++){
           console.log("got here")
           this.instance.goToNextPage()

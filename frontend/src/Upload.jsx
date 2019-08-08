@@ -1,8 +1,9 @@
 import React from 'react';
 import { withRouter } from "react-router-dom";
+import bsCustomFileInput from 'bs-custom-file-input';
 
 
-
+/** component that deals with uploading and loading fault trees from pdf */
 class Upload extends React.Component{
 
     constructor(props) {
@@ -13,6 +14,14 @@ class Upload extends React.Component{
 
     }
 
+    componentDidMount() {
+      bsCustomFileInput.init()
+    }
+
+    /** takes the file uploaded by the user and the page number
+     * sends to server to retrieve corresponding fault tree
+     * 
+     */
     handleUpload(){
       this.file = this.uploadInput.files[0];
       this.pagenum = document.getElementById("pagenum").value
@@ -39,7 +48,7 @@ class Upload extends React.Component{
 
     
     render() {
-        const ParserSubmit = withRouter(({history}) => (
+        const ParserSubmit = withRouter(({history}) => (// the submit button that loads the url to the parser component
             <button type="submit" className="btn btn-primary p-3" onClick={()=>{
                 this.file = this.uploadInput.files[0];
                 const queryString = require('query-string');
@@ -58,8 +67,10 @@ class Upload extends React.Component{
           ))
         return (
             <form autoComplete="off">
-            <div>
-              <input ref={(ref) => { this.uploadInput = ref; }} type="file"/>
+           
+            <div class="custom-file">
+              <input ref={(ref) => { this.uploadInput = ref; }} type="file" class="custom-file-input file-name" id="customFile"/>
+              <label class="custom-file-label" for="customFile">Choose file</label>
             </div>
             <input id="pagenum" className="form-control form-control-lg" type="text" placeholder="Enter starting PDF page."/>
             <button type="button" className="btn btn-success p-3" onClick={()=>{

@@ -86,8 +86,9 @@ class PDF_Parser(object):
 
     @staticmethod
     def isTextLine_inRect(rect, line):
-        if rect.x0 <= line.x0 and rect.y1 >= line.y1 and rect.x1 >= line.x1 and rect.y0 <= line.y0:
-            return True
+        if rect is not None and line is not None:
+            if rect.x0 <= line.x0 and rect.y1 >= line.y1 and rect.x1 >= line.x1 and rect.y0 <= line.y0:
+                return True
         else: return False
 
 
@@ -325,8 +326,9 @@ class PDF_Parser(object):
         self.recognize_textboxes()
         G = Graph(len(self.rect_content.values()) + 1)
         print(len(self.rect_content.values()))
-        G.set_root_event(self.root_event)
-        print(repr(G.root_event))
+        if self.root_event is not None:
+            G.set_root_event(self.root_event)
+            print(repr(G.root_event))
         self.add_connections()
         for value_tuple in self.rect_content.values():
             print(value_tuple)
@@ -418,19 +420,19 @@ class PDF_Parser(object):
 
 
 def main():
-    #pdf_parser = PDF_Parser("ComplexTree.pdf")
-    #print(pdf_parser.pdf_name)
-    #result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, 60)
-    #print("PRINTING GRAPH")
-    #for i in result.get_events():
-    #    print(repr(i))
-    pdf_parser = PDF_Parser("Rational Troubleshooting guide.pdf")
+    pdf_parser = PDF_Parser("Table_Sysmex.pdf")
     print(pdf_parser.pdf_name)
-    result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, 39)
+    result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf,350 )
     print("PRINTING GRAPH")
-    result.print_graph()
     for i in result.get_events():
         print(repr(i))
+    #pdf_parser = PDF_Parser("Rational Troubleshooting guide.pdf")
+    #print(pdf_parser.pdf_name)
+    #result = pdf_parser.with_pdf(pdf_parser.build_graph_from_pdf, 39)
+    #print("PRINTING GRAPH")
+    #result.print_graph()
+    #for i in result.get_events():
+    #    print(repr(i))
 
     
 

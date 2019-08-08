@@ -98,11 +98,14 @@ class Parser extends React.Component {
       <div className="row"> 
         <div className="col-lg-7">
           <DiagFlow file={this.file} pagenum={this.state.pagenum} hasPdf ={true}/>
-          <TextRep file={this.file} pagenum={this.state.pagenum}/>
+          
         </div>
         <div className="col-lg-5">
         <PdfViewer file={this.file} pagenum={this.state.pagenum}/>
         </div>
+      </div>
+      <div className="row">
+      <TextRep file={this.file} pagenum={this.state.pagenum}/>
       </div>
 
         

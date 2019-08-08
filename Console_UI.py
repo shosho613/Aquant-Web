@@ -1,7 +1,7 @@
 from PDF_Parser import PDF_Parser
 from Graph import Graph
 import csv
-
+#class to test backend using a console user interface
 class Console_UI(object):
 
     def __init__(self):

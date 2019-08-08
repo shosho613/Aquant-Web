@@ -1,4 +1,4 @@
-class SolutionTool{
+class SolutionTool{ // this tool handles the red user handle of the node, changing both the fill of node and changing to type to be a solution.
 
     mouseDown(args,diagramInstance) {
         if(diagramInstance.selectedItems.connectors.length === 0){

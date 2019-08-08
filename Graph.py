@@ -118,7 +118,7 @@ class Graph(object):
         event = self.get_event(src_id)
         for e in event.get_connections():
             print("connection %d" %(e.id))
-            if visited[e.id] is False and event.get_weight(e) == 2  and e.type is "S":
+            if visited[e.id] is False and (event.get_weight(e) == 2 or event.get_weight(e) == 3)  and e.type is "S":
                 temp.append(e.id)
                 print("appended %d" %(e.id))
                 self.DFS(e.id, visited, temp)
