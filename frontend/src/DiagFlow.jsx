@@ -199,10 +199,6 @@ export class DiagFlow extends React.Component {
 
     render() {
         let diagramInstance;
-        let sourceDropdown;
-        let targetDropdown;
-        let toolbarObj;
-        let dialogInstance;
         
         let handles = [{ //sets user buttons on each diagram element
             name: 'solution',
@@ -307,7 +303,7 @@ export class DiagFlow extends React.Component {
 					}}>Apply Edits (Refresh Diagram)</button>
 					<button type="submit" className="btn btn-primary" onClick={this.downloadCSV}>Get Results</button> 
 
-                    <ToolbarComponent id='toolbar' ref={toolbar => (toolbarObj = toolbar)} items={[ // handles the deletion of client side elements. 
+                    <ToolbarComponent id='toolbar'  items={[ // handles the deletion of client side elements. 
                                                                                                     //Only gets updated server-side when apply edits button is triggered
                     {
                         tooltipText: 'Delete',
@@ -332,6 +328,9 @@ export class DiagFlow extends React.Component {
                         let index = this.state.nodes.indexOf(element);
                         console.log(index)
                         this.state.nodes.splice(index, 1);
+                        break;
+                    default:
+                        break;
                 }
             }
         }} />

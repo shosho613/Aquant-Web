@@ -1,6 +1,5 @@
 import React from 'react';
 import DiagFlow from './DiagFlow';
-import TextRep from './TextRep';
 import PdfViewer  from './PdfViewer';
 import { withRouter } from "react-router-dom";
 
@@ -104,10 +103,7 @@ class Parser extends React.Component {
         <PdfViewer file={this.file} pagenum={this.state.pagenum}/>
         </div>
       </div>
-      <div className="row">
-      <TextRep file={this.file} pagenum={this.state.pagenum}/>
-      </div>
-
+      
         
   
     </div>

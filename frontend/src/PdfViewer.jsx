@@ -77,11 +77,11 @@ class PdfViewer extends React.Component {
          
           console.log('this change modified annotations');
         } else if (action === 'delete') { //send the content of the deleted annotation so we can delete from server as well.
-          var data = new FormData()
-          data.append('event', annotations[0].getContents())
+          var data2 = new FormData()
+          data2.append('event', annotations[0].getContents())
           fetch('http://localhost:5000/removeEventFromPDF', {
               method: 'POST',
-              body: data,
+              body: data2,
               headers:{
                 "Access-Control-Allow-Origin" : "*", 
                 "Access-Control-Allow-Credentials" : true,

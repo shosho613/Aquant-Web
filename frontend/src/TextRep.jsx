@@ -52,8 +52,8 @@ class TextRep extends React.Component{
 
 
     render(){
-        const nodes = this.state.nodes;
-        const connectors = this.state.connectors;
+        //const nodes = this.state.nodes;
+        //const connectors = this.state.connectors;
 
         const items = []
 
