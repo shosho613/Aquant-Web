@@ -15,7 +15,7 @@ class PdfViewer extends React.Component {
 
   componentDidMount() {
     window.WebViewer({
-      path: '/lib',
+      path: process.env.NODE_ENV === "development" ? '/lib' : window.sahar + 'lib',
       initialDoc: ''
     }, this.viewer.current).then(instance => {
       // at this point, the viewer is 'ready'
