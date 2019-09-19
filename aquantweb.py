@@ -8,7 +8,7 @@ import json
 
 
 
-aquantweb = Flask(__name__, static_folder='frontend/build/static', template_folder="frontend/build")
+aquantweb = Flask(__name__, static_folder='./static', template_folder="./templates")
 aquantweb.config.from_object('config')
 aquantweb.config['CORS_HEADERS'] = 'Content-Type'
 

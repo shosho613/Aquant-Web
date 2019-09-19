@@ -1,6 +1,7 @@
 import React from 'react';
 import DiagFlow from './DiagFlow';
 import PdfViewer  from './PdfViewer';
+import queryString from 'query-string'
 import { withRouter } from "react-router-dom";
 
 
@@ -48,7 +49,6 @@ class Parser extends React.Component {
         var newPage = parseInt(this.state.pagenum) + 1
         this.setState({pagenum : newPage})
         console.log(this.state.pagenum)
-        const queryString = require('query-string');
         const parsed = queryString.parse(history.location.search)
         parsed.pagenum = newPage
         var stringified = queryString.stringify(parsed)

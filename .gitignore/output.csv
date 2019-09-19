@@ -1,0 +1,25 @@
+Observation,Solution
+Printer Troubleshooting ,Contact your network administrator. The printer's IPaddress must be added as an exception on your firewall.You can find the printer's IP address by going to theSettings tab on the touch screen.
+Printer Troubleshooting ,Proxy servers are not supported on this machine.
+Printer Troubleshooting ,Please contact your network administrator to ensureyou have a DHCP server and that it is set up correctly.
+Printer Troubleshooting ,Ensure that DHCP is enabled in the printer settings.
+Printer Troubleshooting ,"Use the cable on another device, such as a computer, totest it."
+Printer Troubleshooting ,Internet connection via USB is not available on thismachine.
+Printer Troubleshooting ,mqg.3dsystems.com is made as an exception onyour firewall.
+Printer Troubleshooting ,Port 443 is open.
+Network Issues,Contact your network administrator. The printer's IPaddress must be added as an exception on your firewall.You can find the printer's IP address by going to theSettings tab on the touch screen.
+Network Issues,Proxy servers are not supported on this machine.
+Network Issues,Please contact your network administrator to ensureyou have a DHCP server and that it is set up correctly.
+Network Issues,Ensure that DHCP is enabled in the printer settings.
+Network Issues,"Use the cable on another device, such as a computer, totest it."
+Network Issues,Internet connection via USB is not available on thismachine.
+Network Issues,mqg.3dsystems.com is made as an exception onyour firewall.
+Network Issues,Port 443 is open.
+Computer unable toconnect to printer becauseof network firewalls,Contact your network administrator. The printer's IPaddress must be added as an exception on your firewall.You can find the printer's IP address by going to theSettings tab on the touch screen.
+Unable to use proxy serverfor connection,Proxy servers are not supported on this machine.
+Unable to set static IPaddress from machine,Please contact your network administrator to ensureyou have a DHCP server and that it is set up correctly.
+Unable to set static IPaddress from machine,Ensure that DHCP is enabled in the printer settings.
+I am not sure if mynetwork cable is bad,"Use the cable on another device, such as a computer, totest it."
+Cannot connect to Internetvia USB dongle,Internet connection via USB is not available on thismachine.
+"Printer unable to verifymaterials overnetwork/Printer asks to""select previously scannedbottle""",mqg.3dsystems.com is made as an exception onyour firewall.
+"Printer unable to verifymaterials overnetwork/Printer asks to""select previously scannedbottle""",Port 443 is open.
