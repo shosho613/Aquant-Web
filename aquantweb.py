@@ -1,6 +1,4 @@
 from flask import Flask, render_template, send_from_directory, request, send_file, Response
-from models import db
-from werkzeug import secure_filename
 import os
 from JSON_Converter import JSON_Converter 
 from flask_cors import CORS, cross_origin
@@ -17,8 +15,6 @@ cors = CORS(aquantweb)
 addedEvents = []
 pdfFile = ""
 
-db.init_app(aquantweb)
-db.create_all(app=aquantweb)
 
 jc = JSON_Converter()
 
