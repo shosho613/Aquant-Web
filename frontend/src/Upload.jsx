@@ -29,7 +29,7 @@ class Upload extends React.Component{
       data.append('file', this.file);
       data.append('pagenum', this.pagenum)
       console.log(data)
-      fetch('upload', {
+      fetch('/upload', {
         method: 'POST',
         body: data,
         headers:{
