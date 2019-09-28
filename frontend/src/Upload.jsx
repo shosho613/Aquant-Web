@@ -29,7 +29,7 @@ class Upload extends React.Component{
       data.append('file', this.file);
       data.append('pagenum', this.pagenum)
       console.log(data)
-      fetch('http://localhost:5000/upload', {
+      fetch('upload', {
         method: 'POST',
         body: data,
         headers:{

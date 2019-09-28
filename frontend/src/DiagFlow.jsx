@@ -112,7 +112,7 @@ export class DiagFlow extends React.Component {
         var data = new FormData()
         data.append('pagenum', this.pagenum)
         data.append('file', this.file)
-        fetch('http://localhost:5000/GetGraph', {
+        fetch('GetGraph', {
         method: 'POST',
         body: data,
         headers:{
@@ -140,7 +140,7 @@ export class DiagFlow extends React.Component {
         var data = new FormData()
         console.log(this.state.nodes.length)
         data.append("size", String(this.state.nodes.length))
-        fetch('http://localhost:5000/GetAnnots', {
+        fetch('GetAnnots', {
         method: 'POST',
         body: data,
         headers:{
@@ -164,7 +164,7 @@ export class DiagFlow extends React.Component {
         var data = new FormData()
         data.append('nodes', JSON.stringify(this.state.nodes))
         data.append('connectors', JSON.stringify(this.state.connectors))
-        fetch('http://localhost:5000/downloadcsv', {
+        fetch('downloadcsv', {
             method: 'POST',
             body: data,
             headers:{
