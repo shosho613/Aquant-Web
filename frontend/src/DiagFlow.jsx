@@ -1,7 +1,7 @@
 import * as React from "react";
 import './DiagFlow.css'
 import { ToolbarComponent } from '@syncfusion/ej2-react-navigations';
-import { HierarchicalTree, DataBinding, DiagramComponent, Inject, SymbolPaletteComponent, Connector, SnapConstraints } from "@syncfusion/ej2-react-diagrams";
+import { HierarchicalTree, DataBinding, DiagramComponent, Inject, SymbolPaletteComponent, Connector, SnapConstraints } from "@syncfusion/ej2-react-diagrams/dist/es6/ej2-react-diagrams.es2015";
 import SolutionTool from './SolutionTool';
 import ObservationTool from './ObservationTool';
 

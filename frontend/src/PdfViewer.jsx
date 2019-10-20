@@ -36,10 +36,6 @@ class PdfViewer extends React.Component {
       //this.instance.openElement('notesPanel')
 
       // or listen to events from the viewer element
-      this.viewer.current.addEventListener('pageChanged', (e) => {
-        const [ pageNumber ] = e.detail;
-        console.log(`Current page is ${pageNumber}`);
-      });
 
       
 
@@ -87,12 +83,10 @@ class PdfViewer extends React.Component {
                 "Access-Control-Allow-Credentials" : true,
               }
           })
-          console.log('there were annotations deleted');
         }
       })
       this.docViewer.on('documentLoaded', () =>{ // when document loads, go to page chosen by user
         for(var i = 1; i < this.initialPage; i++){
-          console.log("got here")
           this.instance.goToNextPage()
       }
       })
