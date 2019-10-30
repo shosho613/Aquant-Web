@@ -1,8 +1,7 @@
 import React from 'react';
 import DiagFlow from './DiagFlow';
 import PdfViewer  from './PdfViewer';
-import queryString from 'query-string'
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 
 
@@ -14,25 +13,26 @@ class Parser extends React.Component {
     super(props);
     //this.filename = props.location.state.filename
     //this.pagenum = props.location.state.pagenum
-    this.file = props.location.state.file
-    this.data = props.location.state.data
+    //this.file = props.location.state.file
+    //this.data = props.location.state.data
     this.myViewer = React.createRef();
     this.state ={
-      pagenum: props.location.state.pagenum
+      pagenum: props.location.state.pagenum,
+      file: props.location.state.file
     }
+    window.console.log(this.state)
 
 
 
-    window.console.log(this.pagenum)
-    window.console.log(this.file)
-    window.console.log(this.data)
   }
 
 
   
 
   
+  componentWillMount(){
 
+  }
   componentDidMount(){
 
   }
@@ -44,25 +44,7 @@ class Parser extends React.Component {
  
   render(){
     /** loads same parser component with the next page in the pdf file as input to parse. */
-    const NextPage = withRouter(({history}) => (
-      <button type="submit" className="btn btn-primary p-3" onClick={()=>{
-        var newPage = parseInt(this.state.pagenum) + 1
-        this.setState({pagenum : newPage})
-        console.log(this.state.pagenum)
-        const parsed = queryString.parse(history.location.search)
-        parsed.pagenum = newPage
-        var stringified = queryString.stringify(parsed)
-        history.push({
-        pathname: '/parser/',
-        search: stringified,
-        state: {pagenum: newPage, file: this.file,}
-        })
-        window.location.reload();
-          }}>
-       Parse Next Page 
-       </button>
-
-    ))
+    
     
     /** sends user back to the home page */
     const BackHome = withRouter(({history}) => (
@@ -74,6 +56,19 @@ class Parser extends React.Component {
           }}>
        </img>
 
+    ))
+
+    const NextPage = withRouter(({history}) => (
+      <button className="btn btn-primary" onClick={() =>{
+        var newPage = parseInt(this.state.pagenum) + 1;
+        console.log(newPage)
+        console.log(this.file)
+        history.push({
+          pathname: '/parser',
+          state: {pagenum: newPage, file:this.state.file}
+        })
+        window.location.reload()
+      }}>Parse Next Page</button>
     ))
 
     
@@ -96,11 +91,11 @@ class Parser extends React.Component {
         </div>
       <div className="row"> 
         <div className="col-lg-7">
-          <DiagFlow file={this.file} pagenum={this.state.pagenum} hasPdf ={true}/>
+          <DiagFlow file={this.state.file} pagenum={this.state.pagenum} hasPdf ={true}/>
           
         </div>
         <div className="col-lg-5">
-        <PdfViewer file={this.file} pagenum={this.state.pagenum}/>
+        <PdfViewer file={this.state.file} pagenum={this.state.pagenum}/>
         </div>
       </div>
       

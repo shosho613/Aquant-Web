@@ -21,8 +21,10 @@ jc = JSON_Converter()
 @aquantweb.route('/')
 @cross_origin()
 def home():
-    jc = JSON_Converter()
-# addedEvents = []
+    return render_template('index.html')
+
+@aquantweb.route('/parser')
+def parser():
     return render_template('index.html')
 
 @aquantweb.route('/upload', methods = ['GET', 'POST'])
