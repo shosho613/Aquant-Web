@@ -63,7 +63,7 @@ class PdfViewer extends React.Component {
           console.log(annotations[0].getContents())
           var data = new FormData()
           data.append('event', annotations[0].getContents())
-          fetch('http://localhost:5000/addEventFromPDF', {
+          fetch('/addEventFromPDF', {
               method: 'POST',
               body: data,
               headers:{
@@ -79,7 +79,7 @@ class PdfViewer extends React.Component {
         } else if (action === 'delete') { //send the content of the deleted annotation so we can delete from server as well.
           var data2 = new FormData()
           data2.append('event', annotations[0].getContents())
-          fetch('http://localhost:5000/removeEventFromPDF', {
+          fetch('/removeEventFromPDF', {
               method: 'POST',
               body: data2,
               headers:{

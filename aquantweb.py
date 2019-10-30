@@ -19,6 +19,7 @@ pdfFile = ""
 jc = JSON_Converter()
 
 @aquantweb.route('/')
+@cross_origin()
 def home():
     jc = JSON_Converter()
 # addedEvents = []

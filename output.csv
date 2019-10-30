@@ -1,0 +1,21 @@
+Observation,Solution
+"Display is frozen, does not react to touch pad input",Remove SD card. 
+"Display is frozen, does not react to touch pad input",Change SD card (data are copied auto-matically)
+Display is reacting again,Change SD card (data are copied auto-matically)
+Display is flickering or has stripes,Change 30 pol cable 40.03.516Display ok?
+Display is flickering or has stripes,Change Interface Board A1 back and change main PCB A2 42.00.261
+Display is flickering when Y5 is actuated,"Check 18V power from T1 to terminal X14, Cable and plug"
+Display is reacting again,Change SD card (data are copied auto-matically)
+"PCB is booting automatically, unit is switching off and on automatically",Remove SD card. 
+"PCB is booting automatically, unit is switching off and on automatically",Change SD card (data are copied auto-matically)
+"Display is frozen, Service level can not be accessed",Remove bus cable from Motor or PCB
+"Display is frozen, Service level can not be accessed",Trouble shooting
+Service 34 is indicated,Trouble shooting
+Enter service level,Trouble shooting
+"SCC_WE display, coloured, instable",Remove SD card. 
+"SCC_WE display, coloured, instable",Change SD card (data are copied auto-matically)
+"SCC_WE display, coloured, instable",Change 30 pol cable 40.03.516Display ok?
+"SCC_WE display, coloured, instable",Change Interface Board A1 back and change main PCB A2 42.00.261
+"SCC_WE display, coloured, instable","Check 18V power from T1 to terminal X14, Cable and plug"
+"SCC_WE display, coloured, instable",Remove bus cable from Motor or PCB
+"SCC_WE display, coloured, instable",Trouble shooting
